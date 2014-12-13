@@ -16,8 +16,5 @@ Ext.onReady(function() {
     }
 
     var theme = getQueryParam('theme') || defaultTheme;
-    var cssFiles = ['popup', 'tree'];
-    for (var i=0, ii=cssFiles.length; i<ii; ++i) {
-        addThemeCss('../../resources/css/' + cssFiles[i] + '-' + theme + '.css');
-    }
+    addThemeCss('../../build/' + theme + '/resources/GeoExt-all.css');
 });

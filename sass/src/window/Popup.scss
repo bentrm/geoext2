@@ -1,26 +1,86 @@
+// Example:
+//
+// $padding: 1px 2px 3px;
+//   top($padding) ...... 1px
+//   right($padding) .... 2px
+//   bottom($padding) ... 3px
+//   left($padding) ..... 2px
+ 
+@function top($args) {
+    $len: length($args);
+    @if ($len >= 1 and $len <= 4) {@return nth($args, 1);}
+}
+@function right($args) {
+    $len: length($args);
+    @if ($len == 1) {@return nth($args, 1);}
+    @if ($len == 2) {@return nth($args, 2);}
+    @if ($len == 3) {@return nth($args, 2);}
+    @if ($len == 4) {@return nth($args, 2);}
+}
+@function bottom($args) {
+    $len: length($args);
+    @if ($len == 1) {@return nth($args, 1);}
+    @if ($len == 2) {@return nth($args, 1);}
+    @if ($len == 3) {@return nth($args, 3);}
+    @if ($len == 4) {@return nth($args, 3);}
+}
+@function left($args) {
+    $len: length($args);
+    @if ($len == 1) {@return nth($args, 1);}
+    @if ($len == 2) {@return nth($args, 2);}
+    @if ($len == 3) {@return nth($args, 2);}
+    @if ($len == 4) {@return nth($args, 4);}
+}
+
 $gx-popup-anc-height: 16px;
-$gx-popup-anc-offset: 5px;
+
+$gx-popup-anc-offset-vertical: -($gx-popup-anc-height * 2);
+$gx-popup-anc-offset-left: 5px;
+$gx-popup-anc-offset-right: 5px;
 
 .gx-popup {
     overflow: visible;
 }
 
-.gx-popup-anc {
-    background: transparent theme-background-image('#{$theme-name}/anchor', 'png', false) no-repeat 0 0;
+.gx-popup-anc::before, .gx-popup-anc::after {
+    content: ' ';
+    z-index: 1;
+    height: 0;
+    width: 0;
     position: absolute;
-    left: $gx-popup-anc-offset;
-    z-index: 2;
-    height: $gx-popup-anc-height;
-    width: 31px;
-    pointer-events: none;
+    border: $gx-popup-anc-height solid transparent;
+    display: block;
 }
 
-.gx-popup-anc.top {
-    background: transparent theme-background-image('#{$theme-name}/anchor-top', 'png', false) no-repeat 0 0;
-    top: -$gx-popup-anc-height;
+.gx-popup-anc-top:before {
+    top: $gx-popup-anc-offset-vertical;
+    border-bottom-color: $window-border-color;
 }
 
-.gx-popup-anc.right {
-    left: auto;
-    right: $gx-popup-anc-offset;
+.gx-popup-anc-top:after {
+    top: $gx-popup-anc-offset-vertical + $window-header-border-width;
+    border-bottom-color: $window-header-background-color;
+}
+
+.gx-popup-anc-bottom:before {
+    bottom: $gx-popup-anc-offset-vertical;
+    border-top-color: $window-border-color;
+}
+
+.gx-popup-anc-bottom:after {
+    @if $window-include-border-management-rules {
+        bottom: $gx-popup-anc-offset-vertical + $window-wrap-border-width;
+        border-top-color: $window-wrap-border-color;
+    } @else {
+        bottom: $gx-popup-anc-offset-vertical + $window-body-border-width;
+        border-top-color: $window-header-background-color;
+    }
+}
+
+.gx-popup-anc-left::before, .gx-popup-anc-left::after {
+    left: $gx-popup-anc-offset-left;
+}
+
+.gx-popup-anc-right:before, .gx-popup-anc-right::after {
+    right: $gx-popup-anc-offset-right;
 }

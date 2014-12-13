@@ -151,6 +151,20 @@ Ext.define('GeoExt.window.Popup', {
     ancCls: null,
 
     /**
+     * Width of the popups anchor.
+     * @type {Number}
+     */
+    ancSize: {
+        width: 32,
+        height: 16
+    },
+
+    ancOffset: {
+        left: 5,
+        right: 5
+    },
+
+    /**
      * Controls the anchor position for the popup. If set to `auto`, the anchor
      * will be positioned on the top or the bottom of the window, minimizing map
      * movement. Supported values are `bottom-left`, `bottom-right`, `top-left`,
@@ -192,8 +206,6 @@ Ext.define('GeoExt.window.Popup', {
             this.addAnchorEvents();
         }
 
-        this.elements += ',anc';
-
         this.callParent(arguments);
     },
 
@@ -207,23 +219,24 @@ Ext.define('GeoExt.window.Popup', {
      */
     onRender: function(ct, position) {
         this.callParent(arguments);
+
         this.addCls(this.popupCls);
-        this.ancCls = this.popupCls + "-anc";
+        // this.ancCls = this.popupCls + "-anc";
 
         //create anchor dom element.
         //this.createElement("anc", this.el.dom);
-        var dh = Ext.core.DomHelper; // create shorthand alias
+        // var dh = Ext.core.DomHelper; // create shorthand alias
         // specification the anchor div
-        var spec = {
-            tag: 'div',
-            cls: this.ancCls
-        };
+        // var spec = {
+        //     tag: 'div',
+        //     cls: this.ancCls
+        // };
 
-        var ancDiv = dh.append(
-            this.el.dom, // the context element
-            spec      // the specification object
-        );
-        this.anc = Ext.get(ancDiv);
+        // var ancDiv = dh.append(
+        //     this.el.dom, // the context element
+        //     spec      // the specification object
+        // );
+        // this.anc = Ext.get(ancDiv);
     },
 
     /**
@@ -254,6 +267,7 @@ Ext.define('GeoExt.window.Popup', {
     show: function() {
         this.callParent(arguments);
         if(this.anchored) {
+            this.addCls('gx-popup-anc');
             this.position();
             if(this.panIn && !this._mapMove) {
                 this.panIntoView();
@@ -282,7 +296,7 @@ Ext.define('GeoExt.window.Popup', {
      */
     setSize: function(w, h) {
         if(this.anc) {
-            var ancSize = this.anc.getSize();
+            var ancSize = this.ancSize;
 
             if(typeof w == 'object') {
                 h = w.height - ancSize.height;
@@ -313,38 +327,30 @@ Ext.define('GeoExt.window.Popup', {
                 top = locationPx.y + mapBox.y,
                 left = locationPx.x + mapBox.x,
                 elSize = this.el.getSize(),
-                ancSize = this.anc.getSize(),
+                ancSize = this.ancSize,
                 ancPos = this.anchorPosition;
 
             if (ancPos.indexOf("right") > -1 || locationPx.x > mapBox.width / 2) {
                 // right
-                this.anc.addCls("right");
-                var ancRight = this.el.getX(true) + elSize.width -
-                               this.anc.getX(true) - ancSize.width;
-                left -= elSize.width - ancRight - ancSize.width / 2;
+                this.removeCls("gx-popup-anc-left");
+                this.addCls("gx-popup-anc-right");
+                left -= elSize.width - this.ancOffset.right - ancSize.width / 2;
             } else {
                 // left
-                this.anc.removeCls("right");
-                var ancLeft = this.anc.getLeft(true);
-                left -= ancLeft + ancSize.width / 2;
+                this.removeCls("gx-popup-anc-right");
+                this.addCls("gx-popup-anc-left");
+                left -= this.ancOffset.left + ancSize.width / 2;
             }
 
             if (ancPos.indexOf("bottom") > -1 || locationPx.y > mapBox.height / 2) {
                 // bottom
-                this.anc.removeCls("top");
-                // position the anchor
-                var popupHeight = this.getHeight();
-                if (isNaN(popupHeight) === false) {
-                    this.anc.setTop((popupHeight-1) + "px");
-                }
-
+                this.removeCls("gx-popup-anc-top");
+                this.addCls("gx-popup-anc-bottom");
                 top -= elSize.height + ancSize.height;
-
             } else {
                 // top
-                this.anc.addCls("top");
-                // remove eventually set top property (bottom-case)
-                this.anc.setTop("");
+                this.removeCls("gx-popup-anc-bottom");
+                this.addCls("gx-popup-anc-top");
                 top += ancSize.height; // ok
             }
 
@@ -377,8 +383,7 @@ Ext.define('GeoExt.window.Popup', {
         this.dd = new Ext.util.ComponentDragger(this, ddConfig);
 
         //remove anchor
-        this.anc.remove();
-        this.anc = null;
+        this.removeCls('gx-popup-anc');
 
         //hide unpin tool
         this.tools.unpin.hide();
