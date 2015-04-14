@@ -504,6 +504,17 @@ Ext.define('GeoExt.data.MapfishPrintProvider', {
      *
      * @param {Ext.data.Record} layout The record of the layout.
      */
+    setOutputFormat: function(outputFormat) {
+        console.log(outputFormat);
+        this.outputFormat = outputFormat;
+        this.fireEvent("outputformatchange", this, outputFormat);
+    },
+
+    /**
+     * Sets the layout for this printProvider.
+     *
+     * @param {Ext.data.Record} layout The record of the layout.
+     */
     setLayout: function(layout) {
         this.layout = layout;
         this.fireEvent("layoutchange", this, layout);
