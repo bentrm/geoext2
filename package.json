@@ -1,6 +1,6 @@
 {
-  "name": "geoext2",
-  "version": "2.0.4-dev",
+  "name": "GeoExt",
+  "version": "2.0.4",
   "description": "A JavaScript Toolkit for Rich Web Mapping Applications based on OpenLayers and ExtJS.",
   "main": "index.js",
   "directories": {
@@ -29,5 +29,19 @@
   "dependencies": {
     "casperjs": "^1.1.0-beta3",
     "phantomjs": "^1.9.16"
-  }
+  },
+
+  "type": "code",
+  "creator": "geoext",
+  "compatVersion": "2.0.0",
+  "format": "1",
+  "slicer": {
+    "js": [{
+      "path": "${package.dir}/sass/example/custom.js",
+      "isWidgetManifest": true
+    }]
+  },
+  "output": "${package.dir}/build",
+  "local": true,
+  "requires": []
 }
