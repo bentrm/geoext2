@@ -31,5 +31,19 @@
   "dependencies": {
     "casperjs": "^1.1.0-beta3",
     "phantomjs": "^1.9.16"
-  }
+  },
+
+  "type": "code",
+  "creator": "geoext",
+  "compatVersion": "2.0.0",
+  "format": "1",
+  "slicer": {
+    "js": [{
+      "path": "${package.dir}/sass/example/custom.js",
+      "isWidgetManifest": true
+    }]
+  },
+  "output": "${package.dir}/build",
+  "local": true,
+  "requires": []
 }
