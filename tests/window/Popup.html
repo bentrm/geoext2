@@ -55,7 +55,7 @@
                 feature: feature,
                 map: map,
                 mapPanel: mapPanel
-            };      
+            };
         }
 
         function setupMultiFeatureContext() {
@@ -110,7 +110,7 @@
             context.map.destroy();
             context.mapPanel.destroy();
         }
-        
+
         function tearDown(context) {
             context.feature.destroy();
             context.map.destroy();
@@ -146,7 +146,7 @@
 
             pop.show();
 
-            t.ok(Ext.getBody().child("div." + pop.popupCls),"viewport contains popup");
+            t.ok(Ext.getBody().child("div." + pop.cls),"viewport contains popup");
 
             tearDown(context);
         }
@@ -160,7 +160,7 @@
 
             pop.show();
 
-            t.ok(Ext.getBody().child("div." + pop.popupCls),"viewport contains popup");
+            t.ok(Ext.getBody().child("div." + pop.cls),"viewport contains popup");
 
             tearDown(context);
         }
@@ -175,7 +175,7 @@
             // show the popup and move the map to ensure popup is actually visible
             pop.show();
             context.map.setCenter(new OpenLayers.LonLat(5, 45));
-            
+
             var moves = 0;
             pop.on({
                 move: function() {
@@ -189,7 +189,7 @@
                 pop.show();
             };
 
-            t.ok(pop.anc, "Popup has anchor element");
+            t.ok(pop.hasCls("gx-popup-anc"), "Popup has anchor css class");
 
             // move the map and confirm that popup moves
             context.map.setCenter(new OpenLayers.LonLat(6, 45));
@@ -208,7 +208,7 @@
             pop.expand();
             t.ok(moves > 0, "anchored popup moves on expand");
             resetPop();
-            
+
             // resize popup and confirm that it moves
             pop.setSize(100, 100);
             t.ok(moves > 0, "anchored popup moves on resize");
@@ -253,10 +253,10 @@
 
             action = "popup expand"
             pop.expand();
-            
+
             action = "popup collapse";
             pop.collapse();
-            
+
             tearDown(context);
 
         }
@@ -374,25 +374,25 @@
             tearDown(context);
 
         }
-        
+
         function test_Popup_position(t) {
             t.plan(5);
-            
+
             var context = setupContext();
-            
+
             var pos = context.feature.geometry.getBounds().getCenterLonLat()
             var pop = popup(pos, context.map);
             t.eq(pop.location.toString(), pos.toString(), "Popup with LonLat positioned correctly");
-            
+
             var px = context.map.getViewPortPxFromLonLat(pos);
             pop = popup(px, context.map);
             t.eq(pop.location.toString(), context.map.getLonLatFromViewPortPx(px).toString(), "Popup with Pixel positioned correctly");
-            
+
             // mock up a geometry without getCentroid method
             context.feature.geometry.getCentroid = null;
             pop = popup(context.feature);
             t.eq(pop.location.toString(), pos.toString(), "Popup with Feature positioned correctly");
-            
+
             var geom = new OpenLayers.Geometry.Point(1, 42);
             pop = popup(geom, context.map);
             t.eq(pop.location.toString(), geom.getCentroid().getBounds().getCenterLonLat().toString(), "Popup with Point positioned correctly");
@@ -428,7 +428,7 @@
             var context = setupContext();
             var pop = popup(context.feature);
             pop.show();
-            
+
             var called = false;
             pop.on({
                 move: function() {
@@ -438,9 +438,9 @@
             pop.destroy();
 
             context.map.events.triggerEvent("move");
-            
+
             t.ok(!called, "pop is not moved after it is destroyed");
-            
+
             tearDown(context);
         }
 
@@ -448,16 +448,16 @@
             t.plan(5);
 
             var context = setupContext();
-            
+
             // Reusable popup (closeAction = hide)
             var pop = popup(context.feature, null, {
                 closeAction: 'hide'
             });
-            
+
             pop.show();
 
             // Center map to popup's location
-            context.map.setCenter(new OpenLayers.LonLat(5, 45));           
+            context.map.setCenter(new OpenLayers.LonLat(5, 45));
             t.ok(pop.insideViewport && !pop.hidden, "Reusable popup is visible when open and inside the viewport");
 
             // Pan map outside popup's location
@@ -468,7 +468,7 @@
             context.map.panTo(new OpenLayers.LonLat(5, 45));
             pop.hide();
             context.map.panTo(new OpenLayers.LonLat(6, 45));
-            t.ok(pop.insideViewport && pop.hidden, "Reusable popup is hidden when closed and inside the viewport");          
+            t.ok(pop.insideViewport && pop.hidden, "Reusable popup is hidden when closed and inside the viewport");
 
 
             // Regular popup (destroyed when closed)
@@ -476,7 +476,7 @@
             pop2.show();
 
             // Center map to popup's location
-            context.map.setCenter(new OpenLayers.LonLat(5, 45));           
+            context.map.setCenter(new OpenLayers.LonLat(5, 45));
             t.ok(pop2.insideViewport && !pop2.hidden, "Regular popup is visible when open and inside the viewport");
 
             // Pan map outside popup's location
@@ -490,26 +490,27 @@
             t.plan(8);
 
             var context = setupMultiFeatureContext();
-            var pop;
+            var pop, anchoredCls;
 
             Ext.each(context.features, function(feat) {
                 pop = popup(feat, context.mapPanel, {anchorPosition: "auto"});
+                anchoredCls = pop.anchoredCls;
                 pop.show();
-                
+
                 var ancPos = feat.attributes.expectedAutoPosition.split("-");
-                
+
                 // the following 4 assertions are called twice each
                 if (ancPos[0] === "top") {
-                    t.ok(pop.el.child("div.top"), "popups with anchor at the top have the corresponding CSS class");
+                    t.ok(pop.hasCls(anchoredCls + "-top"), "popups with anchor at the top have the corresponding CSS class");
                 } else {
-                    t.ok(!pop.el.child("div.top"), "popups with anchor at the bottom do not have an extra CSS class");
+                    t.ok(!pop.hasCls(anchoredCls + "-top"), "popups with anchor at the bottom do not have an extra CSS class");
                 }
                 if (ancPos[1] == "right") {
-                    t.ok(pop.el.child("div.right"), "popups with anchor on the right have the corresponding CSS class");
+                    t.ok(pop.hasCls(anchoredCls + "-right"), "popups with anchor on the right have the corresponding CSS class");
                 } else {
-                    t.ok(!pop.el.child("div.right"), "popups with anchor on the left do not have an extra CSS class");
+                    t.ok(!pop.hasCls(anchoredCls + "-right"), "popups with anchor on the left do not have an extra CSS class");
                 }
-                
+
                 pop.destroy();
             });
             tearDownMultiFeature(context);
@@ -523,7 +524,7 @@
                 var pop = popup(feat, context.mapPanel, {anchorPosition: "bottom-left"});
                 pop.show();
                 t.eq(pop.anchorPosition, "bottom-left", "fixed position set correctly");
-                t.ok(!pop.el.child("div.top"), "popups with fixed position 'bottom-left' do not have an extra CSS class");
+                t.ok(!pop.hasCls(pop.anchoredCls + "-top"), "popups with fixed position 'bottom-left' do not have an extra CSS class");
                 pop.destroy();
             });
             tearDownMultiFeature(context);
