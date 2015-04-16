@@ -24,6 +24,8 @@ Ext.define('GeoExt.tree.Column', {
     ],
     alias: 'widget.gx_treecolumn',
 
+    cls: 'gx-tree-column',
+
     initComponent: function() {
         var me = this;
 
