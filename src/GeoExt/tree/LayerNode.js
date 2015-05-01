@@ -81,7 +81,7 @@ Ext.define('GeoExt.tree.LayerNode', {
             scope: this
         });
 
-        if (!layer.alwaysInRange && layer.map) {
+        if (layer.map) {
             layer.map.events.register('moveend', this, this.onMapMoveend);
         }
 
@@ -121,7 +121,14 @@ Ext.define('GeoExt.tree.LayerNode', {
      * @private
      */
     onMapMoveend: function(e) {
-        this.target.set('disabled', !this.target.get('layer').inRange);
+        var target = this.target,
+            layer = target.get('layer'),
+            inViewport = layer.getExtent().intersectsBounds(layer.getMaxExtent());
+
+        target.beginEdit();
+        target.set('inViewport', inViewport);
+        target.set('inRange', layer.inRange);
+        target.endEdit();
     },
 
     /**

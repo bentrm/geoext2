@@ -48,7 +48,14 @@ Ext.define('GeoExt.tree.View', {
      * @inheritdoc
      */
     getRowClass: function(record, rowIndex, rowParams, store) {
-        return record.get('disabled') ? 'gx-tree-row-disabled' : '';
+        var cls = [];
+        if (!record.get('inRange')) {
+            cls.push('gx-tree-row-outofrange');
+        }
+        if (!record.get('inViewport')) {
+            cls.push('gx-tree-row-outofviewport');
+        }
+        return cls.join(' ');
     },
 
     /**

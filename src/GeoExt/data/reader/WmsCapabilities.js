@@ -208,6 +208,7 @@ Ext.define('GeoExt.data.reader.WmsCapabilities', {
                             undefined,
                         minScale: layer.minScale,
                         maxScale: layer.maxScale,
+                        maxExtent: layer.llbbox,
                         metadata: metadata
                     };
                     if(this.layerOptions) {
