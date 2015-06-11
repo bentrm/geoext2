@@ -59,8 +59,10 @@ Ext.define('GeoExt.tree.LayerNode', {
      * @private
      */
     init: function(target) {
+        var layer, loading;
+
         this.target = target;
-        var layer = target.get('layer');
+        layer = target.get('layer');
 
         target.set('checked', layer.getVisibility());
         if (!target.get('checkedGroup') && layer.isBaseLayer) {
@@ -68,21 +70,41 @@ Ext.define('GeoExt.tree.LayerNode', {
         }
         target.set('fixedText', !!target.text);
 
-        target.set('leaf', true);
+        if (!target.childNodes.length) {
+            target.set('leaf', true);
+        }
 
         if(!target.get('iconCls')) {
             target.set('iconCls', "gx-tree-layer-icon");
         }
 
         target.on('afteredit', this.onAfterEdit, this);
+        // target.cascadeBy(function(child) {
+        //     if (target !== child)
+        //         child.on('afteredit', this.onNestedAfterEdit, this);
+        // }, this);
+
+        loading = layer.loading;
+        if (loading === undefined &&
+                layer.CLASS_NAME === 'OpenLayers.Layer.Vector' &&
+                layer.protocol) {
+            loading = true;
+        } else {
+            loading = false;
+        }
+        this.target.set('loading', loading);
 
         layer.events.on({
+            'loadstart': this.onLayerLoadStart,
+            'loadend': this.onLayerLoadEnd,
             'visibilitychanged': this.onLayerVisibilityChanged,
             scope: this
         });
 
         if (layer.map) {
             layer.map.events.register('moveend', this, this.onMapMoveend);
+            layer.map.events.register('preremovelayer', this, this.onPreremoveLayer);
+            this.onMapMoveend(); // init layer status in tree
         }
 
         GeoExt.tree.Util.enforceOneLayerVisible(this.target);
@@ -99,7 +121,53 @@ Ext.define('GeoExt.tree.LayerNode', {
         var me = this;
 
         if(~Ext.Array.indexOf(modifiedFields, 'checked')) {
-            GeoExt.tree.Util.updateLayerVisibilityByNode(this.target, this.target.get('checked'));
+            this.onCheckChange();
+        }
+    },
+
+    /**
+     * Handler fot the node's child nodes afteredit events.
+     * @param  {Ext.data.NodeInterface} subnode
+     * @param  {String[]} modifiedFields
+     * @private
+     */
+    onNestedAfterEdit: function(subnode, modifiedFields) {
+        var target = this,
+            parent = subnode.parentNode;
+        if (~Ext.Array.indexOf(modifiedFields, 'checked')) {
+            if (!target._nestedVisibilityChanging) {
+                target._nestedVisibilityChanging = true;
+                if ((target !== subnode)
+                        && !subnode.isLeaf()) {
+                    subnode.eachChild(function (child) {
+                        child.set('checked', subnode.get('checked'));
+                    });
+                }
+                if (parent) {
+                    parent.set('checked', !parent.childrenAreChecked(false));
+                }
+                this.target.setLayerParams();
+                target._nestedVisibilityChanging = false;
+            }
+        }
+    },
+
+    onLayerLoadStart: function() {
+        var me = this;
+        me._timeoutID = window.setTimeout(function() {
+          me.target.set('loading', true);
+        }, 200);
+    },
+
+    onLayerLoadEnd: function() {
+        this.clearLoadingTimeout();
+        this.target.set('loading', false);
+    },
+
+    clearLoadingTimeout: function() {
+        if (this._timeoutID) {
+            window.clearTimeout(this._timeoutID);
+            this._timeoutID = null;
         }
     },
 
@@ -121,14 +189,20 @@ Ext.define('GeoExt.tree.LayerNode', {
      * @private
      */
     onMapMoveend: function(e) {
-        var target = this.target,
-            layer = target.get('layer'),
-            inViewport = layer.getExtent().intersectsBounds(layer.getMaxExtent());
+        var layer = this.target.get('layer'),
+            inViewport = true, inRange = true,
+            layerMaxExtent;
 
-        target.beginEdit();
-        target.set('inViewport', inViewport);
-        target.set('inRange', layer.inRange);
-        target.endEdit();
+        if (layer.map) {
+            layerMaxExtent = layer.getMaxExtent ? layer.getMaxExtent() : layer.getDataExtent();
+            layerMaxExtent = layerMaxExtent || layer.getExtent();
+            inViewport = layer.getExtent().intersectsBounds(layerMaxExtent);
+            inRange = layer.inRange;
+
+            this.target.set('disabled', !inRange || !inViewport);
+            this.target.set('inRange', inRange);
+            this.target.set('inViewport', inViewport);
+        }
     },
 
     /**
@@ -155,7 +229,30 @@ Ext.define('GeoExt.tree.LayerNode', {
             }
             delete node._visibilityChanging;
         }
-        GeoExt.tree.Util.enforceOneLayerVisible(node);
-    }
 
+        // if (checked && node.childrenAreChecked(false)) {
+        //     node.checkChildren();
+        // }
+
+        GeoExt.tree.Util.enforceOneLayerVisible(node);
+    },
+
+    onPreremoveLayer: function(e) {
+        var rLayer = e.layer,
+            layer = this.target.get('layer');
+
+        this.clearLoadingTimeout();
+
+        if (rLayer === layer) {
+            layer.events.un({
+                'loadstart': this.onLayerLoadStart,
+                'loadend': this.onLayerLoadEnd,
+                'visibilitychanged': this.onLayerVisibilityChanged,
+                scope: this
+            });
+
+            layer.map.events.unregister('moveend', this, this.onMapMoveend);
+            layer.map.events.unregister('preremovelayer', this, this.onPreremoveLayer);
+        }
+    }
 });

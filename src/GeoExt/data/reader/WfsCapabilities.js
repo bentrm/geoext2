@@ -133,8 +133,11 @@ Ext.define('GeoExt.data.reader.WfsCapabilities', {
 
                 metadata['name'] = featureType.name;
                 metadata['featureNS'] = featureType.featureNS;
+                metadata['operationsMetadata'] = opMeta;
 
                 protocolOptions = {
+                    version: data.version,
+                    // srsName: featureType.srs,
                     featureType: featureType.name,
                     featureNS: featureType.featureNS
                 };
@@ -148,8 +151,8 @@ Ext.define('GeoExt.data.reader.WfsCapabilities', {
                 layerOptions = {
                     metadata: metadata,
                     protocol: new OpenLayers.Protocol.WFS(protocolOptions),
-                    strategies: [new OpenLayers.Strategy.Fixed()],
-                    projection: featureType.srs
+                    strategies: [new OpenLayers.Strategy.Fixed()]
+                    // projection: featureType.srs
                 };
                 var metaLayerOptions = this.getLayerOptions();
                 if (metaLayerOptions) {

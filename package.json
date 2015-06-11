@@ -33,9 +33,7 @@
     "phantomjs": "^1.9.16"
   },
 
-  "type": "code",
   "creator": "geoext",
-  "compatVersion": "2.0.0",
   "format": "1",
   "slicer": {
     "js": [{

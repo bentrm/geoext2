@@ -178,19 +178,54 @@ Ext.define('GeoExt.tree.LayerLoader', {
                 }],
                 layer: layer,
                 text: layer.name,
+                name: layer.metadata.name,
                 listeners: {
                     move: this.onChildMove,
                     scope: this
                 }
             });
+
+            var childNode;
             if (index !== undefined) {
-                node.insertChild(index, child);
+                childNode = node.insertChild(index, child);
             } else {
-                node.appendChild(child);
+                childNode = node.appendChild(child);
             }
+
+            // nested child nodes for each nested layer
+            // var nestedLayers = layer.metadata.nestedLayers;
+            // if (nestedLayers) {
+            //     for (var i = 0; i < nestedLayers.length; i++) {
+            //         this.addNestedLayerNode(childNode, layer, nestedLayers[i], i);
+            //     }
+            // }
+
             node.getChildAt(index).on("move", this.onChildMove, this);
         }
     },
+
+    // adds nested nodes to a layerstreenode if any
+    addNestedLayerNode: function(node, layer, params, index) {
+        var nestedLayers = params.nestedLayers || [],
+            length = nestedLayers.length,
+            childNode;
+
+        node.set('leaf', false);
+        childNode = node.insertChild(index, {
+            text: params.title,
+            name: params.name,
+            layerParams: params,
+            iconCls: 'gxc-icon-layer-nested',
+            checked: true,
+            allowDrag: false,
+            leaf: true
+        });
+
+        for (var i=0; i < length; i++) {
+            this.addNestedLayerNode(childNode, layer, nestedLayers[i]);
+        }
+    },
+
 
     /**
      * Removes a child node representing a layer of the map

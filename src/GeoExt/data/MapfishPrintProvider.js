@@ -505,7 +505,6 @@ Ext.define('GeoExt.data.MapfishPrintProvider', {
      * @param {Ext.data.Record} layout The record of the layout.
      */
     setOutputFormat: function(outputFormat) {
-        console.log(outputFormat);
         this.outputFormat = outputFormat;
         this.fireEvent("outputformatchange", this, outputFormat);
     },
@@ -631,6 +630,7 @@ Ext.define('GeoExt.data.MapfishPrintProvider', {
                     var encFn = this.encoders.legends[cmp.getXType()];
                     // MapFish Print doesn't currently support per-page
                     // legends, so we use the scale of the first page.
+                    if (!encFn) return;
                     encodedLegends = encodedLegends.concat(
                         encFn.call(this, cmp, jsonData.pages[0].scale));
                 }

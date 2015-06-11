@@ -202,13 +202,14 @@ Ext.define('GeoExt.data.reader.WmsCapabilities', {
                         metadata[field.name] = layer[field.name];
                     }
                     metadata['name'] = layer.name;
+                    metadata['nestedLayers'] = this.nestedLayers(layer.nestedLayers || []);
+                    metadata['service'] = data.service;
                     options = {
                         attribution: layer.attribution ?
                             this.attributionMarkup(layer.attribution) :
                             undefined,
                         minScale: layer.minScale,
                         maxScale: layer.maxScale,
-                        maxExtent: layer.llbbox,
                         metadata: metadata
                     };
                     if(this.layerOptions) {
@@ -271,5 +272,17 @@ Ext.define('GeoExt.data.reader.WmsCapabilities', {
         }
 
         return markup.join(" ");
+    },
+
+    nestedLayers: function(layers) {
+        var nested = [];
+        for (var i=0; i < layers.length; i++) {
+            nested[i] = {
+                name: layers[i].name,
+                title: layers[i].title,
+                nestedLayers: this.nestedLayers(layers[i].nestedLayers)
+            };
+        }
+        return nested;
     }
 });

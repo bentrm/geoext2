@@ -288,6 +288,8 @@ Ext.define('GeoExt.container.VectorLegend', {
      * @private
      */
     onFeaturesAdded: function() {
+        if (!this.layer.features.length) return;
+
         this.layer.events.un({
             featuresadded: this.onFeaturesAdded,
             scope: this

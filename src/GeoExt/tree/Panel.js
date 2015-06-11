@@ -17,7 +17,7 @@
  * When you use the tree in an application, make sure to include the proper
  * stylesheet depending on the Ext theme that you use: `tree-classic.css`,
  * `tree-access.css`, 'tree-gray.css` or `tree-neptune.css`.
- * 
+ *
  * @class GeoExt.tree.Panel
  */
 Ext.define('GeoExt.tree.Panel', {
@@ -29,7 +29,7 @@ Ext.define('GeoExt.tree.Panel', {
         'GeoExt.tree.Util'
     ],
     viewType: 'gx_treeview',
-    
+
     initComponent: function() {
         var me = this;
 
@@ -42,11 +42,11 @@ Ext.define('GeoExt.tree.Panel', {
                 xtype    : 'gx_treecolumn',
                 text     : 'Name',
                 width    : Ext.isIE6 ? null : 10000,
-                dataIndex: me.displayField         
+                dataIndex: me.displayField
             }];
         }
         // bind checkchange for tree nodes to steer visibility of the layers
-        me.on('checkchange', GeoExt.tree.Util.updateLayerVisibilityByNode);
+        // me.on('checkchange', GeoExt.tree.Util.updateLayerVisibilityByNode);
 
         me.callParent();
     }

@@ -342,7 +342,7 @@ Ext.define('GeoExt.window.Popup', {
                 top += ancSize.height; // ok
             }
 
-            this.setPosition(left, top);
+            this.setPagePosition(left, top);
             this.handleAlwaysOnTop();
         }
     },

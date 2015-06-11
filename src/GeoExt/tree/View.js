@@ -49,6 +49,9 @@ Ext.define('GeoExt.tree.View', {
      */
     getRowClass: function(record, rowIndex, rowParams, store) {
         var cls = [];
+        if (record.get('disabled')) {
+            cls.push('gx-tree-row-disabled')
+        }
         if (!record.get('inRange')) {
             cls.push('gx-tree-row-outofrange');
         }

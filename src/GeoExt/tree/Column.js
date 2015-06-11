@@ -43,7 +43,7 @@ Ext.define('GeoExt.tree.Column', {
             }
 
             // Add a hook to add other components in the tree like legend icons
-            buf.push('<div class="gx-tree-component gx-tree-component-off" id="tree-record-'+record.id+'"></div>');
+            // buf.push('<div class="gx-tree-component gx-tree-component-off" id="tree-record-'+record.id+'"></div>');
 
             return buf.join('');
         };

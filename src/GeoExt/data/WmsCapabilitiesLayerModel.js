@@ -47,6 +47,12 @@ Ext.define('GeoExt.data.WmsCapabilitiesLayerModel',{
         {name: "identifiers", mapping: "metadata.identifiers"}, // object
         {name: "authorityURLs", mapping: "metadata.authorityURLs"}, // object
         {name: "metadataURLs", mapping: "metadata.metadataURLs"} // array
+        // {name: "nestedLayers", mapping: "metadata.nestedLayers"},
+        // {name: "leaf", type: "boolean", mapping: "metadata.nestedLayers",
+        //         convert: function(v, rec) {
+        //             return !(Ext.isArray(v) && v.length);
+        //         }
+        // }
     ],
     proxy: {
         type: 'ajax',

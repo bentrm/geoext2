@@ -203,6 +203,14 @@ Ext.define('GeoExt.data.reader.Attribute', {
         if (!this.getFormat()) {
             this.setFormat(new OpenLayers.Format.WFSDescribeFeatureType());
         }
+
+        var feature = this.feature || this.getFeature();
+        var model = this.model;
+        if (this.getModel) {
+            // ExtJS 5 needs the getter
+            model = this.getModel();
+        }
+
         var attributes;
         if(data instanceof Array) {
             attributes = data;
@@ -213,13 +221,13 @@ Ext.define('GeoExt.data.reader.Attribute', {
                 this.raw = result;
             }
             attributes = result.featureTypes[0].properties;
+            model.featureTypeAttrs = {
+                targetNamespace: result.targetNamespace,
+                targetPrefix: result.targetPrefix,
+                typeName: result.featureTypes[0].typeName
+            };
         }
-        var feature = this.feature || this.getFeature();
-        var model = this.model;
-        if (this.getModel) {
-            // ExtJS 5 needs the getter
-            model = this.getModel();
-        }
+
         var fields = model.prototype.fields;
         var numFields = fields.length;
         var attr, values, name, record, ignore, value, field, records = [];

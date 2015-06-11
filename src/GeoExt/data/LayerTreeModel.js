@@ -65,8 +65,7 @@ Ext.define('GeoExt.data.LayerTreeModel',{
         {name: 'checkedGroup', type: 'string'},
         {name: 'fixedText', type: 'bool'},
         {name: 'component'},
-        {name: 'inRange', type: 'bool', defaultValue: true},
-        {name: 'inViewport', type: 'bool', defaultValue: true}
+        {name: 'disabled', type: 'bool'}
     ],
     proxy: {
         type: "memory"
@@ -152,18 +151,17 @@ Ext.define('GeoExt.data.LayerTreeModel',{
                 var plugin, instance;
                 for (var i=0, ii=plugins.length; i<ii; ++i) {
                     plugin = plugins[i];
-                    instance = Ext.PluginMgr.create(Ext.isString(plugin) ? {
+                    me.layerNodePlugin = Ext.PluginMgr.create(Ext.isString(plugin) ? {
                         ptype: plugin
                     } : plugin);
-                    instance.init(me);
+                    me.layerNodePlugin.init(me);
                 }
             }
         });
     },
 
     init: function(){
-        var me = this;
-        me.id = me.recordnameToItemId(me.id);
+        this.id = this.recordnameToItemId(this.id);
     },
 
     // TODO this isn't called anymore find another way for checking if checkchange
