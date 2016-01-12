@@ -68,7 +68,14 @@ Ext.define('GeoExt.data.LayerTreeModel',{
         {name: 'checkedGroup', type: 'string'},
         {name: 'fixedText', type: 'bool'},
         {name: 'component'},
-        {name: 'disabled', type: 'bool', defaultValue: false},
+        {
+            name: 'disabled',
+            type: 'bool',
+            convert: function(v, record) {
+                var layer = record.data.layer;
+                return (layer ? !layer.inRange : false);
+            }
+        },
         {
             name: 'hideSpinnerInLayerTree',
             type: 'bool',
