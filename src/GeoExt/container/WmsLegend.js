@@ -220,7 +220,13 @@ Ext.define('GeoExt.container.WmsLegend', {
                 FORMAT: null,
                 TIME: null
             }, this.baseParams);
-            
+
+            if (layer.params.VERSION === '1.3.0') {
+                Ext.apply(paramObject, {
+                    SLD_VERSION: '1.1.0'
+                });
+            }
+
             url = layer.getFullRequestString(paramObject);
             params = {};
         }
